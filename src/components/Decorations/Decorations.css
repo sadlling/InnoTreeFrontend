@@ -1,0 +1,9 @@
+.decorations{
+    position:absolute;
+    cursor: pointer;
+}
+.decorations-img{
+    height: 50px;
+    width: 50px;
+    
+}

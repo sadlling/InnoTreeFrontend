@@ -1,0 +1,8 @@
+div.Tree {
+    background: url('/Treee.jpg') no-repeat center center;
+    background-size: cover;
+    display: block;
+    width: 100vw;
+    height: 100vh;
+}
+
