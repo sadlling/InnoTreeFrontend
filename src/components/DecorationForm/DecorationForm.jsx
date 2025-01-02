@@ -3,12 +3,12 @@ import "./DecorationForm.css";
 
 export const DecorationForm = async ({ x, y, onSubmit }) => {
   const options = [
-    { value: "train", text: "Поезд", image: "/decorations/train.png" },
-    { value: "ball", text: "Шар", image: "/decorations/ball.png" },
-    { value: "star", text: "Звезда", image: "/decorations/star.png" },
-    { value: "penguin", text: "Пингвин", image: "/decorations/penguin.png" },
-    { value: "bear", text: "Медведь", image: "/decorations/bear.png" },
-    { value: "tree", text: "Елка", image: "/decorations/tree.png" },
+    { name: "train", text: "Поезд", image: "/decorations/train.png" },
+    { name: "ball", text: "Шар", image: "/decorations/ball.png" },
+    { name: "star", text: "Звезда", image: "/decorations/star.png" },
+    { name: "penguin", text: "Пингвин", image: "/decorations/penguin.png" },
+    { name: "bear", text: "Медведь", image: "/decorations/bear.png" },
+    { name: "tree", text: "Елка", image: "/decorations/tree.png" },
   ]; // Получение данных из API, если требуется.
 
   const formHtml = `
@@ -19,8 +19,7 @@ export const DecorationForm = async ({ x, y, onSubmit }) => {
       <select id="decorationType" class="decoration-select">
         ${options
           .map(
-            (option) =>
-              `<option value="${option.value}">${option.text}</option>`
+            (option) => `<option value="${option.name}">${option.text}</option>`
           )
           .join("")}
       </select>
@@ -40,7 +39,7 @@ export const DecorationForm = async ({ x, y, onSubmit }) => {
 
       decorationSelect.addEventListener("change", (event) => {
         const selectedOption = options.find(
-          (o) => o.value === event.target.value
+          (o) => o.name === event.target.value
         );
         decorationPreview.src = selectedOption.image;
       });
@@ -48,9 +47,14 @@ export const DecorationForm = async ({ x, y, onSubmit }) => {
   });
 
   if (result.isConfirmed) {
-    const decorationType = document.getElementById("decorationType").value;
-    const text = document.getElementById("decorationText").value;
-
-    onSubmit({ x, y, decoration: decorationType, text });
+    const name = document.getElementById("decorationType").value;
+    const message = document.getElementById("decorationText").value;
+    const decorationSelect = document.getElementById("decorationType");
+    const selectedOption =
+      decorationSelect.options[decorationSelect.selectedIndex];
+    const image = options.find(
+      (option) => option.name === selectedOption.value
+    ).image;
+    onSubmit({ name, message, image, x, y });
   }
 };

@@ -3,24 +3,88 @@ import Swal from "sweetalert2";
 import "./ChristmasTree.css";
 import { Decorations } from "../components/Decorations/Decorations.jsx";
 import { DecorationForm } from "../components/DecorationForm/DecorationForm.jsx";
+import { getAllToys, AddToy } from "../services/toyService.js";
+import * as signalR from "@microsoft/signalr";
 
 export const ChristmasTree = () => {
   const [decorations, setDecorations] = useState([]);
   const [treeMask, setTreeMask] = useState(null);
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
+  const [hubConnection, setHubConnection] = useState(null);
 
-  const handleAddDecoration = ({ x, y, decoration, text }) => {
-    setDecorations([...decorations, { x, y, decoration, text }]);
+  useEffect(() => {
+    fetchDecorations();
+  }, []);
+
+  useEffect(() => {
+    // const connection = new signalR.HubConnectionBuilder()
+    //   .withUrl("http://localhost:5173/tree")
+    //   .withAutomaticReconnect()
+    //   .build();
+    // connection.start().then(() => {
+    //   console.log("SignalR connected");
+    //   setHubConnection(connection);
+    //   connection.on("ReceiveToy", (newToy) => {
+    //     setDecorations((prev) => [...prev, newToy]);
+    //   });
+    // });
+    // return () => {
+    //   if (connection) connection.stop();
+    // };
+  }, []);
+
+  const fetchDecorations = async () => {
+    let response;
+    try {
+      response = await getAllToys();
+      // console.log(response);
+      setDecorations(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const createDecoration = async (newToy) => {
+    try {
+      const response = await AddToy(newToy);
+      console.log(response);
+      // Сообщаем SignalR серверу о новой игрушке
+      // if (hubConnection) {
+      //   await hubConnection.invoke("SendToy", newToy);
+      // }
+    } catch (error) {
+      // console.error("Error adding decoration:", error);
+    }
+  };
+
+  const handleAddDecoration = async ({ name, message, image, x, y }) => {
+    setDecorations((prev) => [...prev, { name, message, image, x, y }]);
+    try {
+      await createDecoration({
+        name,
+        message,
+        image,
+        x: x,
+        y: y,
+      });
+    } catch {
+      console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+      Swal.fire({
+        title: "Ошибка",
+        text: "Не удалось сохранить игрушку на сервере. Попробуйте позже.",
+        icon: "error",
+        confirmButtonText: "Ок",
+      });
+      setDecorations((prev) =>
+        prev.filter((toy) => toy.x !== x || toy.y !== y)
+      );
+    }
   };
 
   const updateCanvasAndMask = () => {
-    console.log("updateCanvasAndMask");
     const img = new Image();
     img.style.backgroundSize = "cover";
     img.src = "/TreeWithoutBackground.png"; // Маска: прозрачный фон, елка — непрозрачная
-    console.log(screen.availHeight);
-    console.log(screen.availWidth);
     img.onload = () => {
       const canvas = document.createElement("canvas");
       canvas.width = screen.availWidth;

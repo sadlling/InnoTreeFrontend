@@ -1,7 +1,7 @@
 import "./Decorations.css";
 
 export const Decorations = ({ decorations }) => {
-  return decorations.map(({ x, y, decoration, text }, index) => (
+  return decorations.map(({ name, message, image, x, y }, index) => (
     <div
       className="decorations"
       key={index}
@@ -9,13 +9,9 @@ export const Decorations = ({ decorations }) => {
         top: y,
         left: x,
       }}
-      title={text}
+      title={message}
     >
-      <img
-        className="decorations-img"
-        src={"/decorations/" + decoration + ".png"}
-        alt={decoration}
-      />
+      <img className="decorations-img" src={image} alt={name} />
     </div>
   ));
 };
