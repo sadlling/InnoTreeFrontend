@@ -14,21 +14,46 @@ export const ChristmasTree = () => {
     setDecorations([...decorations, { x, y, decoration, text }]);
   };
 
-  useEffect(() => {
+  const updateCanvasAndMask = () => {
+    console.log("updateCanvasAndMask");
     const img = new Image();
-
+    img.style.backgroundSize = "cover";
     img.src = "/TreeWithoutBackground.png"; // Маска: прозрачный фон, елка — непрозрачная
+    console.log(screen.availHeight);
+    console.log(screen.availWidth);
     img.onload = () => {
-      setImgWidth(img.width);
-      setImgHeight(img.height);
       const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
+      canvas.width = screen.availWidth;
+      canvas.height = screen.availHeight;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0);
-
-      setTreeMask(ctx.getImageData(0, 0, img.width, img.height));
+      // canvas.style.position = "absolute"; // Чтобы можно было позиционировать
+      // canvas.style.top = "0"; // Укажите положение
+      // canvas.style.left = "0"; // Укажите положение
+      // canvas.style.border = "1px solid red"; // Добавьте рамку для наглядности
+      // document.body.appendChild(canvas);
+      setImgWidth(screen.availWidth);
+      setImgHeight(screen.availHeight);
+      setTreeMask(
+        ctx.getImageData(0, 0, screen.availWidth, screen.availHeight)
+      );
     };
+  };
+
+  const handleResize = () => {
+    // Здесь мы просто обновляем размеры, если контейнер изменился
+    const treeElement = document.querySelector(".Tree");
+    if (treeElement) {
+      setImgWidth(treeElement.offsetWidth);
+      setImgHeight(treeElement.offsetHeight);
+      updateCanvasAndMask();
+    }
+  };
+
+  useEffect(() => {
+    updateCanvasAndMask();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleTreeClick = async (e) => {
